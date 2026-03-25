@@ -163,10 +163,10 @@ const App = () => {
         id: 'building-scroll',
         scrollTrigger: {
           trigger: '#hero',
-          start: 'top top',
+          start: 'top top%', // Moved start marker upwards
           endTrigger: '#vision',
           end: 'bottom bottom',
-          scrub: 2.2,
+          scrub: 1.5,
           immediateRender: false,
         },
         xPercent: -65,
@@ -188,7 +188,7 @@ const App = () => {
       gsap.to('.hero-title', {
         x: xPos,
         y: yPos,
-        duration: 1.5,
+        duration: 2.5,
         ease: 'power2.out',
       });
     };
@@ -201,7 +201,7 @@ const App = () => {
   return (
     <div ref={container} className="bg-[#050505] text-white overflow-hidden min-h-screen">
       {/* Loader Backdrop */}
-      <div ref={loaderRef} className="loader-backdrop fixed inset-0 z-[45] bg-[#082f17] pointer-events-none" />
+      <div ref={loaderRef} className="loader-backdrop fixed inset-0 z-[45] bg-[#050505] pointer-events-none" />
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 w-full z-50">
