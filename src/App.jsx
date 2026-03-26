@@ -2,6 +2,8 @@ import { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import Lenis from 'lenis';
+import 'lenis/dist/lenis.css';
 import { TbMenu3 } from "react-icons/tb";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -163,7 +165,7 @@ const App = () => {
         id: 'building-scroll',
         scrollTrigger: {
           trigger: '#hero',
-          start: 'top top%', // Moved start marker upwards
+          start: 'top top',
           endTrigger: '#vision',
           end: 'bottom bottom',
           scrub: 1.5,
@@ -173,10 +175,29 @@ const App = () => {
         y: window.innerHeight,
         scale: 1.5,
         yPercent: 0,
-        ease: 'power1.inOut',
       });
     };
 
+    // Initialize Lenis
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      smoothTouch: false,
+      touchMultiplier: 2,
+      infinite: false,
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+
+    gsap.ticker.lagSmoothing(0);
 
     // Mouse movement micro-interaction
     const hero = document.querySelector('#hero');
@@ -194,8 +215,13 @@ const App = () => {
     };
 
     hero?.addEventListener('mousemove', handleMouseMove);
-    return () => hero?.removeEventListener('mousemove', handleMouseMove);
 
+    return () => {
+      hero?.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('wheel', skipIntro);
+      window.removeEventListener('touchmove', skipIntro);
+      lenis.destroy();
+    };
   }, { scope: container });
 
   return (
