@@ -12,6 +12,7 @@ const App = () => {
   const container = useRef();
   const loaderRef = useRef();
   const realLogoRef = useRef();
+  const visionContentRef = useRef();
 
   useGSAP(() => {
     // Get final native position of the logo
@@ -168,13 +169,53 @@ const App = () => {
           start: 'top top',
           endTrigger: '#vision',
           end: 'bottom bottom',
-          scrub: 1.5,
+          scrub: .5,
           immediateRender: false,
+          snap: {
+            snapTo: 1, // SNAP to the nearest section (Hero 0 or Vision 1)
+            duration: { min: 0.2, max: 0.8 },
+            delay: 0.1,
+          }
         },
         xPercent: -65,
         y: window.innerHeight,
         scale: 1.5,
         yPercent: 0,
+        filter: 'grayscale(1)',
+        WebkitFilter: 'grayscale(1)',
+      });
+
+      // Vision Content Reveal
+      gsap.from('.vision-detail-item', {
+        scrollTrigger: {
+          trigger: '#vision',
+          start: 'top 20%', // Reveal slightly before reaching the absolute top
+          toggleActions: 'play none none reverse',
+        },
+        x: 50,
+        opacity: 0,
+        duration: 1.2,
+        stagger: 0.2,
+        ease: 'power2.out',
+        onStart: () => {
+          // Count up effect
+          const counters = document.querySelectorAll('.stat-number');
+          counters.forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-target'));
+            const suffix = counter.getAttribute('data-suffix') || '';
+            const obj = { val: 0 };
+            
+            gsap.to(obj, {
+              val: target,
+              duration: 2,
+              ease: 'power2.out',
+              delay: 0.5,
+              onUpdate: () => {
+                counter.innerText = Math.round(obj.val) + suffix;
+              }
+            });
+          });
+        }
       });
     };
 
@@ -242,18 +283,18 @@ const App = () => {
       {/* Hero Section */}
       <section 
         id="hero" 
-        className="relative min-h-screen flex items-center justify-center pt-20"
+        className="relative h-screen flex items-center justify-center pt-20 snap-start"
       >
         {/* Background Group (Clipped to Hero Height) */}
         <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
           <div className="absolute inset-0 w-full h-full bg-[url('/bg_mountain.png')] bg-cover bg-top scale-[1.15]"></div>
           <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
         </div>
-        <div className="absolute inset-0 flex flex-col justify-start items-center pt-24 md:pt-32 select-none pointer-events-none z-[5]">
-          <div className="overflow-hidden">
-            <div className="hero-text-block uppercase tracking-tighter leading-none text-center -mt-.5">
-              <div className="text-[clamp(2.5rem,6vw,5rem)] font-medium premium-text-gradient whitespace-nowrap">WE CONSTRUCT</div>
-              <div className="text-[clamp(4.5rem,15vw,12rem)] font-semibold premium-text-gradient whitespace-nowrap -mt-[.1em]">YOUR VISION</div>
+        <div className="absolute inset-0 flex flex-col justify-center md:justify-start items-center pt-0 md:pt-32 select-none pointer-events-none z-[5] px-4 -translate-y-28 md:translate-y-0">
+          <div className="overflow-hidden w-full">
+            <div className="hero-text-block uppercase tracking-tighter leading-none text-center -mt-.5 w-full">
+              <div className="text-[clamp(1.5rem,8vw,5rem)] font-medium premium-text-gradient">WE CONSTRUCT</div>
+              <div className="text-[clamp(2.5rem,10vw,8rem)] font-semibold premium-text-gradient -mt-[.1em]">YOUR VISION</div>
             </div>
           </div>
         </div>
@@ -280,7 +321,7 @@ const App = () => {
           className="cloud-4 absolute bottom-1/3 -left-1/4 w-[40%] h-auto mix-blend-screen opacity-25 z-[12] pointer-events-none rotate-[-15deg]" 
         />
 
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-full flex justify-center items-end px-6">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-[150vw] md:w-full flex justify-center items-end px-0 md:px-6">
           <img 
             src="/Homepage.png" 
             alt="Estate Homepage Hero" 
@@ -292,8 +333,44 @@ const App = () => {
       {/* Second Section (Empty for building arrival) */}
       <section 
         id="vision" 
-        className="relative h-[100vh] w-[100vw] bg-transparent z-20 flex items-end p-0"
+        className="relative h-screen w-full bg-transparent z-20 flex flex-col md:flex-row items-center justify-start md:justify-end pl-8 md:pl-24 pr-8 md:pr-12 pt-24 md:pt-0 snap-start"
       >
+        <div ref={visionContentRef} className="max-w-2xl w-full text-center md:text-right pointer-events-none z-30">
+          <div className="vision-detail-item mb-10 md:mb-24 overflow-hidden">
+            <h2 className="text-[clamp(2rem,5vw,4rem)] font-medium tracking-tight leading-none premium-text-gradient uppercase">
+              Built on
+            </h2>
+            <h2 className="text-[clamp(4rem,12vw,10rem)] font-semibold tracking-tighter leading-[0.8] premium-text-gradient uppercase -mt-[.1em]">
+              Trust
+            </h2>
+          </div>
+
+          <div className="vision-detail-item grid grid-cols-2 gap-y-12 gap-x-8 mb-10 md:mb-16 border-t border-white/10 pt-12">
+            <div className="space-y-1">
+              <p className="stat-number text-4xl md:text-6xl font-light tracking-tighter premium-text-gradient" data-target="10" data-suffix="+">0+</p>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-white/30">Years Experience</p>
+            </div>
+            <div className="space-y-1">
+              <p className="stat-number text-4xl md:text-6xl font-light tracking-tighter premium-text-gradient" data-target="50" data-suffix="+">0+</p>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-white/30">Projects Delivered</p>
+            </div>
+            <div className="space-y-1">
+              <p className="stat-number text-4xl md:text-6xl font-light tracking-tighter premium-text-gradient" data-target="1" data-suffix="M+">0M+</p>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-white/30">Sq.ft Developed</p>
+            </div>
+            <div className="space-y-1">
+              <p className="stat-number text-4xl md:text-6xl font-light tracking-tighter premium-text-gradient" data-target="1000" data-suffix="+">0+</p>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-white/30">Happy Families</p>
+            </div>
+          </div>
+
+          <div className="vision-detail-item mt-8 opacity-60">
+            <p className="text-sm md:text-md text-white font-light tracking-[0.3em] uppercase">
+              Built on trust. Proven by results.
+            </p>
+          </div>
+        </div>
+        
         {/* The building (hero-image) glides here into the bottom-left corner */}
       </section>
     </div>
