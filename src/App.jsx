@@ -71,7 +71,6 @@ const App = () => {
       ease: 'expo.inOut',
       force3D: true
     }) // immediate start after fade-in
-    // 3. Slide the loader div up AFTER logo reaches destination
     .to(loaderRef.current, {
       yPercent: -100,
       duration: 1.6,
@@ -162,34 +161,39 @@ const App = () => {
       // Prevent double initialization
       if (gsap.getById('building-scroll')) return;
 
+      // 1. Building Glide: Hero -> Vision
       gsap.to('.hero-image', {
         id: 'building-scroll',
         scrollTrigger: {
           trigger: '#hero',
           start: 'top top',
           endTrigger: '#vision',
-          end: 'bottom bottom',
+          end: 'top top', 
           scrub: .5,
           immediateRender: false,
-          snap: {
-            snapTo: 1, // SNAP to the nearest section (Hero 0 or Vision 1)
-            duration: { min: 0.2, max: 0.8 },
-            delay: 0.1,
-          }
         },
         xPercent: -65,
-        y: window.innerHeight,
+        y: 0, // Stay at the bottom of the viewport fixed position
         scale: 1.5,
-        yPercent: 0,
         filter: 'grayscale(1)',
         WebkitFilter: 'grayscale(1)',
+      });
+
+      // 2. Pin Vision: Let Portfolio overlay it
+      ScrollTrigger.create({
+        trigger: '#vision',
+        start: 'top top',
+        end: '+=100%',
+        pin: true,
+        pinSpacing: false, // Allows portfolio to slide over
+        scrub: true,
       });
 
       // Vision Content Reveal
       gsap.from('.vision-detail-item', {
         scrollTrigger: {
           trigger: '#vision',
-          start: 'top 20%', // Reveal slightly before reaching the absolute top
+          start: 'top 20%', 
           toggleActions: 'play none none reverse',
         },
         x: 50,
@@ -197,25 +201,6 @@ const App = () => {
         duration: 1.2,
         stagger: 0.2,
         ease: 'power2.out',
-        onStart: () => {
-          // Count up effect
-          const counters = document.querySelectorAll('.stat-number');
-          counters.forEach(counter => {
-            const target = parseInt(counter.getAttribute('data-target'));
-            const suffix = counter.getAttribute('data-suffix') || '';
-            const obj = { val: 0 };
-            
-            gsap.to(obj, {
-              val: target,
-              duration: 2,
-              ease: 'power2.out',
-              delay: 0.5,
-              onUpdate: () => {
-                counter.innerText = Math.round(obj.val) + suffix;
-              }
-            });
-          });
-        }
       });
     };
 
@@ -321,58 +306,77 @@ const App = () => {
           className="cloud-4 absolute bottom-1/3 -left-1/4 w-[40%] h-auto mix-blend-screen opacity-25 z-[12] pointer-events-none rotate-[-15deg]" 
         />
 
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-[150vw] md:w-full flex justify-center items-end px-0 md:px-6">
-          <img 
-            src="/Homepage.png" 
-            alt="Estate Homepage Hero" 
-            className="hero-image w-full max-w-5xl xl:max-w-6xl drop-shadow-2xl translate-z-0 block" 
-          />
-        </div>
       </section>
 
-      {/* Second Section (Empty for building arrival) */}
+      {/* Second Section (Pinned Vision) */}
       <section 
         id="vision" 
-        className="relative h-screen w-full bg-transparent z-20 flex flex-col md:flex-row items-center justify-start md:justify-end pl-8 md:pl-24 pr-8 md:pr-12 pt-24 md:pt-0 snap-start"
+        className="relative h-screen w-full bg-[#050505] z-20 flex flex-col md:flex-row items-center justify-start md:justify-end pl-8 md:pl-24 pr-8 md:pr-12 pt-24 md:pt-0"
       >
-        <div ref={visionContentRef} className="max-w-2xl w-full text-center md:text-right pointer-events-none z-30">
-          <div className="vision-detail-item mb-10 md:mb-24 overflow-hidden">
-            <h2 className="text-[clamp(2rem,5vw,4rem)] font-medium tracking-tight leading-none premium-text-gradient uppercase">
-              Built on
+        <div ref={visionContentRef} className="max-w-4xl w-full text-center md:text-right pointer-events-none z-30 px-4 md:px-0">
+          <div className="vision-detail-item">
+            <h2 className="text-[clamp(1.2rem,2.8vw,2.2rem)] font-light tracking-tight leading-relaxed premium-text-gradient italic">
+              "WE DO NOT JUST BUILD STRUCTURES;<br className="hidden md:block" /> WE ARCHITECT LEGACIES."
             </h2>
-            <h2 className="text-[clamp(4rem,12vw,10rem)] font-semibold tracking-tighter leading-[0.8] premium-text-gradient uppercase -mt-[.1em]">
-              Trust
-            </h2>
-          </div>
-
-          <div className="vision-detail-item grid grid-cols-2 gap-y-12 gap-x-8 mb-10 md:mb-16 border-t border-white/10 pt-12">
-            <div className="space-y-1">
-              <p className="stat-number text-4xl md:text-6xl font-light tracking-tighter premium-text-gradient" data-target="10" data-suffix="+">0+</p>
-              <p className="text-[10px] tracking-[0.4em] uppercase text-white/30">Years Experience</p>
-            </div>
-            <div className="space-y-1">
-              <p className="stat-number text-4xl md:text-6xl font-light tracking-tighter premium-text-gradient" data-target="50" data-suffix="+">0+</p>
-              <p className="text-[10px] tracking-[0.4em] uppercase text-white/30">Projects Delivered</p>
-            </div>
-            <div className="space-y-1">
-              <p className="stat-number text-4xl md:text-6xl font-light tracking-tighter premium-text-gradient" data-target="1" data-suffix="M+">0M+</p>
-              <p className="text-[10px] tracking-[0.4em] uppercase text-white/30">Sq.ft Developed</p>
-            </div>
-            <div className="space-y-1">
-              <p className="stat-number text-4xl md:text-6xl font-light tracking-tighter premium-text-gradient" data-target="1000" data-suffix="+">0+</p>
-              <p className="text-[10px] tracking-[0.4em] uppercase text-white/30">Happy Families</p>
-            </div>
-          </div>
-
-          <div className="vision-detail-item mt-8 opacity-60">
-            <p className="text-sm md:text-md text-white font-light tracking-[0.3em] uppercase">
-              Built on trust. Proven by results.
-            </p>
           </div>
         </div>
-        
-        {/* The building (hero-image) glides here into the bottom-left corner */}
       </section>
+
+      {/* Third Section: Portfolio (Overlay) */}
+      <section 
+        id="portfolio" 
+        className="relative min-h-[150vh] w-full z-40 px-8 md:px-24 py-32 flex flex-col items-center"
+      >
+        <div className="w-full max-w-7xl">
+          <div className="overflow-hidden mb-20">
+            <h3 className="text-[clamp(0.8rem,1.5vw,1.2rem)] font-light tracking-[0.5em] text-white/40 uppercase mb-4">
+              Portfolio
+            </h3>
+            <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-medium tracking-tighter premium-text-gradient uppercase leading-none">
+              Selected <br /> Works
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 mt-20">
+            {/* Project Card Placeholder 1 */}
+            <div className="gallery-item group cursor-pointer">
+              <div className="aspect-[4/5] w-full bg-white/5 overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              </div>
+              <div className="mt-6 flex justify-between items-end">
+                <div>
+                  <h4 className="text-xl font-medium tracking-tight">The Obsidian Suite</h4>
+                  <p className="text-sm text-white/40 tracking-widest uppercase mt-1">Luxury Residential</p>
+                </div>
+                <span className="text-sm font-light text-white/20">01</span>
+              </div>
+            </div>
+
+            {/* Project Card Placeholder 2 */}
+            <div className="gallery-item group cursor-pointer md:translate-y-24">
+              <div className="aspect-[4/5] w-full bg-white/5 overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              </div>
+              <div className="mt-6 flex justify-between items-end">
+                <div>
+                  <h4 className="text-xl font-medium tracking-tight">Horizon Tower</h4>
+                  <p className="text-sm text-white/40 tracking-widest uppercase mt-1">Architecture</p>
+                </div>
+                <span className="text-sm font-light text-white/20">02</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Global Building Layer (Above standard sections, below Portfolio overlay) */}
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-[150vw] md:w-full flex justify-center items-end px-0 md:px-6 pointer-events-none hero-image-container">
+        <img 
+          src="/Homepage.png" 
+          alt="Estate Homepage Hero" 
+          className="hero-image w-full max-w-5xl xl:max-w-6xl drop-shadow-2xl translate-z-0 block opacity-0" 
+        />
+      </div>
     </div>
   );
 };
