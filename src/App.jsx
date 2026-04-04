@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -13,6 +13,8 @@ const App = () => {
   const loaderRef = useRef();
   const realLogoRef = useRef();
   const visionContentRef = useRef();
+  const spotlightRef = useRef();
+  const gridRef = useRef();
 
   useGSAP(() => {
     // Get final native position of the logo
@@ -161,31 +163,55 @@ const App = () => {
       // Prevent double initialization
       if (gsap.getById('building-scroll')) return;
 
-      // 1. Building Glide: Hero -> Vision
-      gsap.to('.hero-image', {
-        id: 'building-scroll',
-        scrollTrigger: {
-          trigger: '#hero',
-          start: 'top top',
-          endTrigger: '#vision',
-          end: 'top top', 
-          scrub: .5,
-          immediateRender: false,
-        },
-        xPercent: -65,
-        y: 0, // Stay at the bottom of the viewport fixed position
-        scale: 1.5,
-        filter: 'grayscale(1)',
-        WebkitFilter: 'grayscale(1)',
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 769px)", () => {
+        // Desktop Settings
+        gsap.to('.hero-image', {
+          id: 'building-scroll',
+          scrollTrigger: {
+            trigger: '#hero',
+            start: 'top top',
+            endTrigger: '#vision',
+            end: 'top top', 
+            scrub: .5,
+            immediateRender: false,
+          },
+          xPercent: -65,
+          y: 0,
+          scale: 1.5,
+          filter: 'grayscale(1)',
+          WebkitFilter: 'grayscale(1)',
+        });
       });
 
-      // 2. Pin Vision: Let Portfolio overlay it
+      mm.add("(max-width: 768px)", () => {
+        // Mobile Settings: Keep building in frame
+        gsap.to('.hero-image', {
+          id: 'building-mobile',
+          scrollTrigger: {
+            trigger: '#hero',
+            start: 'top top',
+            endTrigger: '#vision',
+            end: 'top top', 
+            scrub: .5,
+            immediateRender: false,
+          },
+          xPercent: -30, // Less aggressive shift
+          y: -80, // Move up to stay in view
+          scale: 1.3, // Slightly smaller scale
+          filter: 'grayscale(1)',
+          WebkitFilter: 'grayscale(1)',
+        });
+      });
+
+      // 2. Pin Vision: Let Portfolio overlay it after a "hold" duration
       ScrollTrigger.create({
         trigger: '#vision',
         start: 'top top',
-        end: '+=100%',
+        end: '+=250%', // Increased duration for cinematic "hold" time
         pin: true,
-        pinSpacing: false, // Allows portfolio to slide over
+        pinSpacing: false, 
         scrub: true,
       });
 
@@ -201,6 +227,151 @@ const App = () => {
         duration: 1.2,
         stagger: 0.2,
         ease: 'power2.out',
+      });
+
+      // Vision Floating Effect
+      gsap.to('.vision-detail-item', {
+        y: -15,
+        duration: 4,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true
+      });
+
+      // 3. Core Principles Animations (Section 3)
+      const principles = gsap.utils.toArray('.principle-item');
+
+      // Centerline growth & Bullet progress
+      gsap.fromTo('.principles-line', 
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          scrollTrigger: {
+            trigger: '#portfolio',
+            start: 'top 40%',
+            end: 'bottom 80%',
+            scrub: true,
+          }
+        }
+      );
+
+      // Vertical Spark with Sync'd Spotlight and Parallax Grid
+      gsap.fromTo('.principles-spark-head',
+        { top: '0%' },
+        {
+          top: '100%',
+          scrollTrigger: {
+            trigger: '#portfolio',
+            start: 'top 40%',
+            end: 'bottom 80%',
+            scrub: true,
+            onUpdate: (self) => {
+              if (spotlightRef.current) {
+                spotlightRef.current.style.setProperty('--spark-y', `${self.progress * 100}%`);
+              }
+              if (gridRef.current) {
+                gsap.set(gridRef.current, { y: -self.progress * 80 });
+              }
+            }
+          }
+        }
+      );
+
+      gsap.fromTo('.principles-spark-tail',
+        { height: 0, top: '0%' }, // Start collapsed
+        {
+          height: 150, // Length of the glowing trail
+          top: '100%',
+          scrollTrigger: {
+            trigger: '#portfolio',
+            start: 'top 40%',
+            end: 'bottom 80%',
+            scrub: true,
+          }
+        }
+      );
+
+      // Active Principle Highlight: Focus text as spark passes
+      principles.forEach((item) => {
+        const title = item.querySelector('h3');
+        const detail = item.querySelector('p');
+
+        gsap.to([title, detail], {
+          opacity: 1,
+          color: '#ffffff',
+          duration: 0.5,
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 60%',
+            once: true, // Permanent illumination
+            toggleActions: 'play none none none',
+          }
+        });
+      });
+
+      // Staggered reveals for each principle block
+      principles.forEach((item) => {
+        const text = item.querySelector('.principle-text');
+
+        // Text and Technical Ornaments (Permanent)
+        gsap.from([text, text.querySelector('.technical-monoscope')], {
+          y: 20,
+          opacity: 0,
+          duration: 1.5,
+          stagger: 0.2,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 90%',
+            once: true,
+            toggleActions: 'play none none none',
+          }
+        });
+
+        // Box and Brackets Reveal (Permanent)
+        const brackets = item.querySelectorAll('.corner-bracket');
+        const boxContainer = item.querySelector('.box-reveal-container');
+        
+        gsap.from(brackets, {
+          scale: 1.2,
+          opacity: 0,
+          duration: 1,
+          stagger: 0.1,
+          ease: 'back.out(2)',
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 85%',
+            once: true,
+            toggleActions: 'play none none none',
+          }
+        });
+
+        gsap.to(boxContainer, {
+          height: '100%',
+          duration: 2,
+          ease: 'power2.inOut',
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 85%', 
+            once: true,
+            toggleActions: 'play none none none',
+          }
+        });
+
+        // Scale bar growth
+        const scaleBar = item.querySelector('.scale-bar');
+        if (scaleBar) {
+          gsap.from(scaleBar, {
+            width: 0,
+            duration: 1.5,
+            ease: 'expo.out',
+            scrollTrigger: {
+              trigger: item,
+              start: 'top 90%',
+              once: true,
+            }
+          });
+        }
       });
     };
 
@@ -232,7 +403,7 @@ const App = () => {
       const xPos = (clientX / window.innerWidth - 0.5) * 30;
       const yPos = (clientY / window.innerHeight - 0.5) * 30;
 
-      gsap.to('.hero-title', {
+      gsap.to('.hero-text-block', {
         x: xPos,
         y: yPos,
         duration: 2.5,
@@ -252,6 +423,7 @@ const App = () => {
 
   return (
     <div ref={container} className="bg-[#050505] text-white overflow-hidden min-h-screen">
+      <div className="fixed-noise-overlay" />
       {/* Loader Backdrop */}
       <div ref={loaderRef} className="loader-backdrop fixed inset-0 z-[45] bg-[#050505] pointer-events-none" />
 
@@ -315,54 +487,119 @@ const App = () => {
       >
         <div ref={visionContentRef} className="max-w-4xl w-full text-center md:text-right pointer-events-none z-30 px-4 md:px-0">
           <div className="vision-detail-item">
-            <h2 className="text-[clamp(1.2rem,2.8vw,2.2rem)] font-light tracking-tight leading-relaxed premium-text-gradient italic">
+            <h2 className="text-[clamp(1.4rem,3vw,2.6rem)] title-serif tracking-tight leading-relaxed premium-text-gradient italic">
               "WE DO NOT JUST BUILD STRUCTURES;<br className="hidden md:block" /> WE ARCHITECT LEGACIES."
             </h2>
           </div>
         </div>
       </section>
 
-      {/* Third Section: Portfolio (Overlay) */}
       <section 
         id="portfolio" 
-        className="relative min-h-[150vh] w-full z-40 px-8 md:px-24 py-32 flex flex-col items-center"
+        className="relative min-h-[110vh] w-full z-40 px-8 md:px-24 py-24 flex flex-col items-center bg-[#1c1c1c] overflow-hidden"
       >
-        <div className="w-full max-w-7xl">
-          <div className="overflow-hidden mb-20">
-            <h3 className="text-[clamp(0.8rem,1.5vw,1.2rem)] font-light tracking-[0.5em] text-white/40 uppercase mb-4">
-              Portfolio
-            </h3>
-            <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-medium tracking-tighter premium-text-gradient uppercase leading-none">
-              Selected <br /> Works
-            </h2>
+        {/* Decorative Foundations */}
+        <div ref={gridRef} className="principles-line::after absolute inset-0 opacity-10 pointer-events-none" />
+        <div ref={spotlightRef} className="spotlight-overlay" />
+        
+        {/* Hero Heading for Section 3 */}
+        <div className="w-full max-w-7xl text-center mb-20 relative z-10 px-4">
+          <h2 className="text-[clamp(1.5rem,3.2vw,2.8rem)] title-serif tracking-tight premium-text-gradient uppercase leading-tight md:leading-none opacity-90 md:whitespace-nowrap">
+            Architecting The Future Through Core Principles
+          </h2>
+        </div>
+
+        <div className="w-full max-w-7xl relative flex flex-col gap-12 md:gap-16">
+          {/* Vertical Centerline with Glowing Tail Spark */}
+          <div className="principles-line hidden md:block">
+            <div className="principles-spark-tail" />
+            <div className="principles-spark-head" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 mt-20">
-            {/* Project Card Placeholder 1 */}
-            <div className="gallery-item group cursor-pointer">
-              <div className="aspect-[4/5] w-full bg-white/5 overflow-hidden relative">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          {/* Principle 1: WHO WE ARE */}
+          <div className="principle-item relative flex flex-col w-full md:w-1/2">
+            <div className="principle-text mb-8 relative">
+              <div className="technical-monoscope text-white/30 mb-2 flex items-center gap-4">
+                <span>01</span>
+                <div className="scale-bar w-12" />
+                <span className="opacity-50">34° 3' 8" N / 118° 14' 37" W</span>
               </div>
-              <div className="mt-6 flex justify-between items-end">
-                <div>
-                  <h4 className="text-xl font-medium tracking-tight">The Obsidian Suite</h4>
-                  <p className="text-sm text-white/40 tracking-widest uppercase mt-1">Luxury Residential</p>
-                </div>
-                <span className="text-sm font-light text-white/20">01</span>
+              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">Who We Are</h3>
+              <p className="text-stone-300 text-sm tracking-widest uppercase">Pioneers of architectural legacy and innovation.</p>
+            </div>
+            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative">
+              <div className="corner-bracket bracket-tl" />
+              <div className="corner-bracket bracket-tr" />
+              <div className="corner-bracket bracket-bl" />
+              <div className="corner-bracket bracket-br" />
+              <div className="box-reveal-container w-full bg-black/60 relative border border-white/5">
+                 <div className="absolute inset-0 border-l border-white/10" />
               </div>
             </div>
+          </div>
 
-            {/* Project Card Placeholder 2 */}
-            <div className="gallery-item group cursor-pointer md:translate-y-24">
-              <div className="aspect-[4/5] w-full bg-white/5 overflow-hidden relative">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          {/* Principle 2: WHAT WE DO */}
+          <div className="principle-item relative flex flex-col w-full md:w-1/2">
+            <div className="principle-text mb-8 relative">
+              <div className="technical-monoscope text-white/30 mb-2 flex items-center gap-4">
+                <span>02</span>
+                <div className="scale-bar w-12" />
+                <span className="opacity-50">52° 31' 12" N / 13° 24' 18" E</span>
               </div>
-              <div className="mt-6 flex justify-between items-end">
-                <div>
-                  <h4 className="text-xl font-medium tracking-tight">Horizon Tower</h4>
-                  <p className="text-sm text-white/40 tracking-widest uppercase mt-1">Architecture</p>
-                </div>
-                <span className="text-sm font-light text-white/20">02</span>
+              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">What We Do</h3>
+              <p className="text-stone-300 text-sm tracking-widest uppercase">Transforming raw vision into reality.</p>
+            </div>
+            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative">
+              <div className="corner-bracket bracket-tl" />
+              <div className="corner-bracket bracket-tr" />
+              <div className="corner-bracket bracket-bl" />
+              <div className="corner-bracket bracket-br" />
+              <div className="box-reveal-container w-full bg-black/60 relative border border-white/5">
+                 <div className="absolute inset-0 border-r border-white/10" />
+              </div>
+            </div>
+          </div>
+
+          {/* Principle 3: MISSION & VALUES */}
+          <div className="principle-item relative flex flex-col w-full md:w-1/2">
+            <div className="principle-text mb-8 relative">
+              <div className="technical-monoscope text-white/30 mb-2 flex items-center gap-4">
+                <span>03</span>
+                <div className="scale-bar w-12" />
+                <span className="opacity-50">25° 11' 50" N / 55° 16' 26" E</span>
+              </div>
+              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">Mission & Values</h3>
+              <p className="text-stone-300 text-sm tracking-widest uppercase">Building with integrity and timeless intent.</p>
+            </div>
+            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative">
+              <div className="corner-bracket bracket-tl" />
+              <div className="corner-bracket bracket-tr" />
+              <div className="corner-bracket bracket-bl" />
+              <div className="corner-bracket bracket-br" />
+              <div className="box-reveal-container w-full bg-black/60 relative border border-white/5">
+                 <div className="absolute inset-0 border-l border-white/10" />
+              </div>
+            </div>
+          </div>
+
+          {/* Principle 4: OUR APPROACH */}
+          <div className="principle-item relative flex flex-col w-full md:w-1/2">
+            <div className="principle-text mb-8 relative">
+              <div className="technical-monoscope text-white/30 mb-2 flex items-center gap-4">
+                <span>04</span>
+                <div className="scale-bar w-12" />
+                <span className="opacity-50">40° 42' 46" N / 74° 0' 21" W</span>
+              </div>
+              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">Our Approach</h3>
+              <p className="text-stone-300 text-sm tracking-widest uppercase">Combining cinematic aesthetics with engineering.</p>
+            </div>
+            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative">
+              <div className="corner-bracket bracket-tl" />
+              <div className="corner-bracket bracket-tr" />
+              <div className="corner-bracket bracket-bl" />
+              <div className="corner-bracket bracket-br" />
+              <div className="box-reveal-container w-full bg-black/60 relative border border-white/5">
+                 <div className="absolute inset-0 border-r border-white/10" />
               </div>
             </div>
           </div>

@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500&family=Space+Mono&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -86,17 +87,168 @@ body {
 nav {
   z-index: 50;
 }
-.gallery-item:hover {
-  transform: scale(0.98);
+/* Core Principles Styling */
+.principles-line {
+  width: 1px;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  transform-origin: top;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
-::-webkit-scrollbar {
-  display: none;
+.principles-spark-head {
+  width: 6px;
+  height: 6px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Intensified Triple-Layer Glow */
+  box-shadow: 
+    0 0 10px rgba(255,255,255,1), 
+    0 0 20px rgba(255,255,255,0.8),
+    0 0 40px rgba(255,255,255,0.4);
+  z-index: 15;
+  animation: sparkPulse 2s infinite ease-in-out;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
-html, body {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+@keyframes sparkPulse {
+  0%, 100% { opacity: 1; filter: brightness(1); transform: translateX(-50%) scale(1); }
+  50% { opacity: 0.8; filter: brightness(1.5); transform: translateX(-50%) scale(1.1); }
+}
+
+.principles-spark-tail {
+  width: 3px; /* Slightly thicker for more light surface */
+  background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.8) 20%, rgba(255,255,255,0) 100%);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%); 
+  /* Multi-Layered Drop-Shadow for massive bloom */
+  filter: 
+    drop-shadow(0 0 5px rgba(255,255,255,1))
+    drop-shadow(0 0 15px rgba(255,255,255,0.6))
+    drop-shadow(0 0 30px rgba(255,255,255,0.3));
+  opacity: 1; /* Pure white at the head */
+  z-index: 10;
+}
+
+.principles-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 100px 100px;
+  pointer-events: none;
+  z-index: -2;
+}
+
+.spotlight-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle 450px at var(--spark-x, 50%) var(--spark-y, 0%), 
+    rgba(255, 255, 255, 0.08) 0%, 
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: plus-lighter;
+  transition: background 0.3s ease;
+}
+
+.fixed-noise-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+  opacity: 0.04; /* Just a little bit */
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.noise-overlay {
+  display: none; /* Replaced by global fixed-noise */
+}
+
+.corner-bracket {
+  width: 12px;
+  height: 12px;
+  border-color: rgba(255,255,255,0.2);
+  position: absolute;
+  z-index: 5;
+}
+
+.bracket-tl { top: -4px; left: -4px; border-top-width: 1px; border-left-width: 1px; }
+.bracket-tr { top: -4px; right: -4px; border-top-width: 1px; border-right-width: 1px; }
+.bracket-bl { bottom: -4px; left: -4px; border-bottom-width: 1px; border-left-width: 1px; }
+.bracket-br { bottom: -4px; right: -4px; border-bottom-width: 1px; border-right-width: 1px; }
+
+.technical-monoscope {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.scale-bar {
+  height: 1px;
+  background-color: rgba(255,255,255,0.2);
+  position: relative;
+}
+
+.scale-bar::before, .scale-bar::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  width: 1px;
+  height: 5px;
+  background-color: rgba(255,255,255,0.4);
+}
+
+.scale-bar::after { right: 0; }
+
+.title-serif {
+  font-family: 'DM Serif Display', serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.box-reveal-container {
+  overflow: hidden;
+  height: 0;
+  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 0 30px rgba(255,255,255,0.03);
+}
+
+/* Ensure staggering works horizontally on desktop */
+@media (min-width: 768px) {
+  .principle-item:nth-child(odd) {
+    align-self: flex-start;
+    text-align: right;
+    padding-right: 40px; /* Reduced from 120px */
+  }
+  
+  .principle-item:nth-child(even) {
+    align-self: flex-end;
+    text-align: left;
+    padding-left: 40px; /* Reduced from 120px */
+  }
+
+  /* Specific padding/margin for the "Box underneath" structure */
+  .principle-item:nth-child(odd) .box-reveal-wrapper {
+    margin-left: auto;
+  }
+  
+  .principle-item:nth-child(even) .box-reveal-wrapper {
+    margin-right: auto;
+  }
 }
