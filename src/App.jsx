@@ -299,11 +299,12 @@ const App = () => {
         gsap.to([title, detail], {
           opacity: 1,
           color: '#ffffff',
-          duration: 0.5,
+          duration: 0.8,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: item,
-            start: 'top 60%',
-            once: true, // Permanent illumination
+            start: 'top 75%',
+            once: true,
             toggleActions: 'play none none none',
           }
         });
@@ -503,8 +504,8 @@ const App = () => {
         <div ref={spotlightRef} className="spotlight-overlay" />
         
         {/* Hero Heading for Section 3 */}
-        <div className="w-full max-w-7xl text-center mb-20 relative z-10 px-4">
-          <h2 className="text-[clamp(1.5rem,3.2vw,2.8rem)] title-serif tracking-tight premium-text-gradient uppercase leading-tight md:leading-none opacity-90 md:whitespace-nowrap">
+        <div className="w-full max-w-7xl text-center mb-16 md:mb-20 relative z-10 px-4">
+          <h2 className="text-[clamp(1.5rem,3.2vw,2.8rem)] title-serif tracking-normal md:tracking-tight premium-text-gradient uppercase leading-snug md:leading-none opacity-90 md:whitespace-nowrap">
             Architecting The Future Through Core Principles
           </h2>
         </div>
@@ -518,21 +519,21 @@ const App = () => {
 
           {/* Principle 1: WHO WE ARE */}
           <div className="principle-item relative flex flex-col w-full md:w-1/2">
-            <div className="principle-text mb-8 relative">
-              <div className="technical-monoscope text-white/30 mb-2 flex items-center gap-4">
+            <div className="principle-text mb-8 relative z-20 text-center md:text-left">
+              <div className="technical-monoscope text-white/50 mb-2 flex items-center justify-center md:justify-start gap-4">
                 <span>01</span>
                 <div className="scale-bar w-12" />
-                <span className="opacity-50">34° 3' 8" N / 118° 14' 37" W</span>
+                <span className="opacity-70">34° 3' 8" N / 118° 14' 37" W</span>
               </div>
               <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">Who We Are</h3>
               <p className="text-stone-300 text-sm tracking-widest uppercase">Pioneers of architectural legacy and innovation.</p>
             </div>
-            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative">
+            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative mx-auto md:mx-0">
               <div className="corner-bracket bracket-tl" />
               <div className="corner-bracket bracket-tr" />
               <div className="corner-bracket bracket-bl" />
               <div className="corner-bracket bracket-br" />
-              <div className="box-reveal-container w-full bg-black/60 relative border border-white/5">
+              <div className="box-reveal-container w-full bg-black/90 relative border border-white/10">
                  <div className="absolute inset-0 border-l border-white/10" />
               </div>
             </div>
@@ -540,21 +541,21 @@ const App = () => {
 
           {/* Principle 2: WHAT WE DO */}
           <div className="principle-item relative flex flex-col w-full md:w-1/2">
-            <div className="principle-text mb-8 relative">
-              <div className="technical-monoscope text-white/30 mb-2 flex items-center gap-4">
+            <div className="principle-text mb-8 relative z-20 text-center md:text-left">
+              <div className="technical-monoscope text-white/50 mb-2 flex items-center justify-center md:justify-start gap-4">
                 <span>02</span>
                 <div className="scale-bar w-12" />
-                <span className="opacity-50">52° 31' 12" N / 13° 24' 18" E</span>
+                <span className="opacity-70">52° 31' 12" N / 13° 24' 18" E</span>
               </div>
               <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">What We Do</h3>
               <p className="text-stone-300 text-sm tracking-widest uppercase">Transforming raw vision into reality.</p>
             </div>
-            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative">
+            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative mx-auto md:mx-0">
               <div className="corner-bracket bracket-tl" />
               <div className="corner-bracket bracket-tr" />
               <div className="corner-bracket bracket-bl" />
               <div className="corner-bracket bracket-br" />
-              <div className="box-reveal-container w-full bg-black/60 relative border border-white/5">
+              <div className="box-reveal-container w-full bg-black/90 relative border border-white/10">
                  <div className="absolute inset-0 border-r border-white/10" />
               </div>
             </div>
@@ -562,21 +563,21 @@ const App = () => {
 
           {/* Principle 3: MISSION & VALUES */}
           <div className="principle-item relative flex flex-col w-full md:w-1/2">
-            <div className="principle-text mb-8 relative">
-              <div className="technical-monoscope text-white/30 mb-2 flex items-center gap-4">
+            <div className="principle-text mb-8 relative z-20 text-center md:text-left">
+              <div className="technical-monoscope text-white/50 mb-2 flex items-center justify-center md:justify-start gap-4">
                 <span>03</span>
                 <div className="scale-bar w-12" />
-                <span className="opacity-50">25° 11' 50" N / 55° 16' 26" E</span>
+                <span className="opacity-70">25° 11' 50" N / 55° 16' 26" E</span>
               </div>
               <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">Mission & Values</h3>
               <p className="text-stone-300 text-sm tracking-widest uppercase">Building with integrity and timeless intent.</p>
             </div>
-            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative">
+            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative mx-auto md:mx-0">
               <div className="corner-bracket bracket-tl" />
               <div className="corner-bracket bracket-tr" />
               <div className="corner-bracket bracket-bl" />
               <div className="corner-bracket bracket-br" />
-              <div className="box-reveal-container w-full bg-black/60 relative border border-white/5">
+              <div className="box-reveal-container w-full bg-black/90 relative border border-white/10">
                  <div className="absolute inset-0 border-l border-white/10" />
               </div>
             </div>
@@ -584,21 +585,21 @@ const App = () => {
 
           {/* Principle 4: OUR APPROACH */}
           <div className="principle-item relative flex flex-col w-full md:w-1/2">
-            <div className="principle-text mb-8 relative">
-              <div className="technical-monoscope text-white/30 mb-2 flex items-center gap-4">
+            <div className="principle-text mb-8 relative z-20 text-center md:text-left">
+              <div className="technical-monoscope text-white/50 mb-2 flex items-center justify-center md:justify-start gap-4">
                 <span>04</span>
                 <div className="scale-bar w-12" />
-                <span className="opacity-50">40° 42' 46" N / 74° 0' 21" W</span>
+                <span className="opacity-70">40° 42' 46" N / 74° 0' 21" W</span>
               </div>
               <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">Our Approach</h3>
               <p className="text-stone-300 text-sm tracking-widest uppercase">Combining cinematic aesthetics with engineering.</p>
             </div>
-            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative">
+            <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative mx-auto md:mx-0">
               <div className="corner-bracket bracket-tl" />
               <div className="corner-bracket bracket-tr" />
               <div className="corner-bracket bracket-bl" />
               <div className="corner-bracket bracket-br" />
-              <div className="box-reveal-container w-full bg-black/60 relative border border-white/5">
+              <div className="box-reveal-container w-full bg-black/90 relative border border-white/10">
                  <div className="absolute inset-0 border-r border-white/10" />
               </div>
             </div>
