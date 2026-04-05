@@ -104,7 +104,7 @@ const App = () => {
       opacity: 0,
       duration: 3,
       ease: 'power2.out'
-    }, "-=1.5")
+    }, "<+=1.0")
     .from('.cloud-2', {
       xPercent: 50,
       opacity: 0,
@@ -122,7 +122,13 @@ const App = () => {
       opacity: 0,
       duration: 3.8,
       ease: 'power2.out'
-    }, "<+=0.2");
+    }, "<+=0.2")
+    .to('.scroll-indicator', {
+      opacity: 1,
+      y: 0,
+      duration: 2,
+      ease: 'power2.out'
+    }, ">-1.5");
 
     // Continuous floating for clouds
     gsap.to('.cloud-1', {
@@ -203,6 +209,19 @@ const App = () => {
           filter: 'grayscale(1)',
           WebkitFilter: 'grayscale(1)',
         });
+      });
+
+      // Hide scroll indicator on scroll
+      gsap.to('.scroll-indicator', {
+        scrollTrigger: {
+          trigger: '#hero',
+          start: 'top top',
+          end: 'bottom 20%',
+          scrub: true,
+        },
+        opacity: 0,
+        y: -20,
+        pointerEvents: 'none'
       });
 
       // 2. Pin Vision: Let Portfolio overlay it after a "hold" duration
@@ -296,18 +315,22 @@ const App = () => {
         const title = item.querySelector('h3');
         const detail = item.querySelector('p');
 
-        gsap.to([title, detail], {
-          opacity: 1,
-          color: '#ffffff',
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 75%',
-            once: true,
-            toggleActions: 'play none none none',
+        gsap.fromTo([title, detail], 
+          { y: 15 }, // Keep subtle movement
+          {
+            y: 0,
+            color: '#ffffff',
+            duration: 1,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: item,
+              start: 'top 85%', 
+              once: true,
+              toggleActions: 'play none none none',
+              immediateRender: false,
+            }
           }
-        });
+        );
       });
 
       // Staggered reveals for each principle block
@@ -315,19 +338,22 @@ const App = () => {
         const text = item.querySelector('.principle-text');
 
         // Text and Technical Ornaments (Permanent)
-        gsap.from([text, text.querySelector('.technical-monoscope')], {
-          y: 20,
-          opacity: 0,
-          duration: 1.5,
-          stagger: 0.2,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 90%',
-            once: true,
-            toggleActions: 'play none none none',
+        gsap.fromTo([text, text.querySelector('.technical-monoscope')], 
+          { y: 20 },
+          {
+            y: 0,
+            duration: 1.8,
+            stagger: 0.1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: item,
+              start: 'top 90%',
+              once: true,
+              toggleActions: 'play none none none',
+              immediateRender: false,
+            }
           }
-        });
+        );
 
         // Box and Brackets Reveal (Permanent)
         const brackets = item.querySelectorAll('.corner-bracket');
@@ -397,25 +423,13 @@ const App = () => {
 
     gsap.ticker.lagSmoothing(0);
 
-    // Mouse movement micro-interaction
-    const hero = document.querySelector('#hero');
-    const handleMouseMove = (e) => {
-      const { clientX, clientY } = e;
-      const xPos = (clientX / window.innerWidth - 0.5) * 30;
-      const yPos = (clientY / window.innerHeight - 0.5) * 30;
+    // Refresh ScrollTrigger after mobile layout settles
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 1000);
 
-      gsap.to('.hero-text-block', {
-        x: xPos,
-        y: yPos,
-        duration: 2.5,
-        ease: 'power2.out',
-      });
-    };
-
-    hero?.addEventListener('mousemove', handleMouseMove);
-
+    // Preloader and Intro Animations
     return () => {
-      hero?.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('wheel', skipIntro);
       window.removeEventListener('touchmove', skipIntro);
       lenis.destroy();
@@ -430,9 +444,10 @@ const App = () => {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 w-full z-50">
-        <div className="px-8 py-6 flex justify-between items-center w-full">
-          <a href="#" ref={realLogoRef} className="text-2xl font-medium tracking-tight opacity-0">ESTATE</a>
-          <button className="nav-items text-3xl hover:text-neutral-400 transition-colors">
+        <div className="nav-bg absolute inset-0 bg-transparent opacity-0 pointer-events-none" />
+        <div className="px-5 sm:px-8 py-6 flex justify-between items-center w-full relative z-10">
+          <a href="#" ref={realLogoRef} className="text-[1.2rem] sm:text-2xl font-medium tracking-tighter sm:tracking-tight opacity-0">EVERCROWN</a>
+          <button className="nav-items text-2xl sm:text-3xl hover:text-neutral-400 transition-colors">
             <TbMenu3 />
           </button>
         </div>
@@ -519,14 +534,14 @@ const App = () => {
 
           {/* Principle 1: WHO WE ARE */}
           <div className="principle-item relative flex flex-col w-full md:w-1/2">
-            <div className="principle-text mb-8 relative z-20 text-center md:text-left">
-              <div className="technical-monoscope text-white/50 mb-2 flex items-center justify-center md:justify-start gap-4">
+            <div className="principle-text mb-8 relative z-20 text-center md:text-left transition-opacity duration-700">
+              <div className="technical-monoscope text-white/60 mb-2 flex items-center justify-center md:justify-start gap-4">
                 <span>01</span>
                 <div className="scale-bar w-12" />
-                <span className="opacity-70">34° 3' 8" N / 118° 14' 37" W</span>
+                <span className="opacity-80">34° 3' 8" N / 118° 14' 37" W</span>
               </div>
-              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">Who We Are</h3>
-              <p className="text-stone-300 text-sm tracking-widest uppercase">Pioneers of architectural legacy and innovation.</p>
+              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2 text-white">Who We Are</h3>
+              <p className="text-stone-300 text-sm tracking-widest uppercase opacity-90">Pioneers of architectural legacy and innovation.</p>
             </div>
             <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative mx-auto md:mx-0">
               <div className="corner-bracket bracket-tl" />
@@ -541,14 +556,14 @@ const App = () => {
 
           {/* Principle 2: WHAT WE DO */}
           <div className="principle-item relative flex flex-col w-full md:w-1/2">
-            <div className="principle-text mb-8 relative z-20 text-center md:text-left">
-              <div className="technical-monoscope text-white/50 mb-2 flex items-center justify-center md:justify-start gap-4">
+            <div className="principle-text mb-8 relative z-20 text-center md:text-left transition-opacity duration-700">
+              <div className="technical-monoscope text-white/60 mb-2 flex items-center justify-center md:justify-start gap-4">
                 <span>02</span>
                 <div className="scale-bar w-12" />
-                <span className="opacity-70">52° 31' 12" N / 13° 24' 18" E</span>
+                <span className="opacity-80">52° 31' 12" N / 13° 24' 18" E</span>
               </div>
-              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">What We Do</h3>
-              <p className="text-stone-300 text-sm tracking-widest uppercase">Transforming raw vision into reality.</p>
+              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2 text-white">What We Do</h3>
+              <p className="text-stone-300 text-sm tracking-widest uppercase opacity-90">Transforming raw vision into reality.</p>
             </div>
             <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative mx-auto md:mx-0">
               <div className="corner-bracket bracket-tl" />
@@ -563,14 +578,14 @@ const App = () => {
 
           {/* Principle 3: MISSION & VALUES */}
           <div className="principle-item relative flex flex-col w-full md:w-1/2">
-            <div className="principle-text mb-8 relative z-20 text-center md:text-left">
-              <div className="technical-monoscope text-white/50 mb-2 flex items-center justify-center md:justify-start gap-4">
+            <div className="principle-text mb-8 relative z-20 text-center md:text-left transition-opacity duration-700">
+              <div className="technical-monoscope text-white/60 mb-2 flex items-center justify-center md:justify-start gap-4">
                 <span>03</span>
                 <div className="scale-bar w-12" />
-                <span className="opacity-70">25° 11' 50" N / 55° 16' 26" E</span>
+                <span className="opacity-80">25° 11' 50" N / 55° 16' 26" E</span>
               </div>
-              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">Mission & Values</h3>
-              <p className="text-stone-300 text-sm tracking-widest uppercase">Building with integrity and timeless intent.</p>
+              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2 text-white">Mission & Values</h3>
+              <p className="text-stone-300 text-sm tracking-widest uppercase opacity-90">Building with integrity and timeless intent.</p>
             </div>
             <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative mx-auto md:mx-0">
               <div className="corner-bracket bracket-tl" />
@@ -585,14 +600,14 @@ const App = () => {
 
           {/* Principle 4: OUR APPROACH */}
           <div className="principle-item relative flex flex-col w-full md:w-1/2">
-            <div className="principle-text mb-8 relative z-20 text-center md:text-left">
-              <div className="technical-monoscope text-white/50 mb-2 flex items-center justify-center md:justify-start gap-4">
+            <div className="principle-text mb-8 relative z-20 text-center md:text-left transition-opacity duration-700">
+              <div className="technical-monoscope text-white/60 mb-2 flex items-center justify-center md:justify-start gap-4">
                 <span>04</span>
                 <div className="scale-bar w-12" />
-                <span className="opacity-70">40° 42' 46" N / 74° 0' 21" W</span>
+                <span className="opacity-80">40° 42' 46" N / 74° 0' 21" W</span>
               </div>
-              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2">Our Approach</h3>
-              <p className="text-stone-300 text-sm tracking-widest uppercase">Combining cinematic aesthetics with engineering.</p>
+              <h3 className="text-[clamp(1.8rem,3.5vw,2.8rem)] title-serif uppercase tracking-tight mb-2 text-white">Our Approach</h3>
+              <p className="text-stone-300 text-sm tracking-widest uppercase opacity-90">Combining cinematic aesthetics with engineering.</p>
             </div>
             <div className="box-reveal-wrapper w-full max-w-lg aspect-video relative mx-auto md:mx-0">
               <div className="corner-bracket bracket-tl" />
@@ -611,10 +626,21 @@ const App = () => {
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-[150vw] md:w-full flex justify-center items-end px-0 md:px-6 pointer-events-none hero-image-container">
         <img 
           src="/Homepage.png" 
-          alt="Estate Homepage Hero" 
+          alt="Evercrown Homepage Hero" 
           className="hero-image w-full max-w-5xl xl:max-w-6xl drop-shadow-2xl translate-z-0 block opacity-0" 
         />
       </div>
+
+      {/* Global Scroll Down Indicator (Placed above building) */}
+      <div className="scroll-indicator">
+        <div className="mouse-circle">
+          <div className="mouse-icon">
+            <div className="mouse-wheel" />
+          </div>
+        </div>
+        <span className="scroll-text">Scroll Down</span>
+      </div>
+
     </div>
   );
 };
