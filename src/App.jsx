@@ -25,28 +25,28 @@ const App = () => {
       title: 'Build and Develop', 
       description: 'It is construction of new building on open plots, developing an area.',
       bullets: ['Greenfield Construction', 'Master Planning & Zoning', 'Core Foundation to Finish', 'Sustainable Development'],
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-modern-architectural-building-with-glass-facade-32863-large.mp4' 
+      videoUrl: 'https://www.youtube.com/embed/l6EzZafb1Pk?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&playsinline=1&playlist=l6EzZafb1Pk' 
     },
     { 
       id: 2, 
       title: 'Architectural Design', 
       description: 'Comprehensive drafting, 3D modeling, and conceptualization for modern luxury spaces.',
       bullets: ['Parametric Modeling', 'Spatial Optimization', 'Material Selection', 'Facade Engineering'],
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-futuristic-modern-architecture-41589-large.mp4' 
+      videoUrl: 'https://www.youtube.com/embed/W4JkmpRjQH8?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&playsinline=1&playlist=W4JkmpRjQH8' 
     },
     { 
       id: 3, 
       title: 'Interior Curation', 
       description: 'Bespoke interior design focusing on high-end materiality and ambient lighting.',
       bullets: ['Custom Millwork', 'Acoustic Treatments', 'Smart Home Integration', 'Procurement'],
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-modern-office-building-with-glass-windows-41595-large.mp4' 
+      videoUrl: 'https://www.youtube.com/embed/xJG7CtJLMIo?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&playsinline=1&playlist=xJG7CtJLMIo' 
     },
     { 
       id: 4, 
       title: 'Estate Management', 
       description: 'Post-construction lifecycle management and premium structural maintenance.',
       bullets: ['Asset Preservation', 'Preventative Maintenance', 'Energy Auditing', 'Concierge Services'],
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-looking-up-at-a-glass-skyscraper-in-the-city-business-3001-large.mp4' 
+      videoUrl: 'https://www.youtube.com/embed/gB2_xBz3_QQ?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&playsinline=1&playlist=gB2_xBz3_QQ' 
     }
   ];
 
@@ -689,14 +689,14 @@ const App = () => {
         `}
       >
         {showcaseItems.map((item, idx) => (
-          <video 
+          <iframe 
             key={item.id}
             src={item.videoUrl}
-            autoPlay 
-            loop 
-            muted 
-            playsInline
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${activeVideo === idx ? 'opacity-100' : 'opacity-0'}`}
+            title={item.title}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className={`absolute inset-0 w-[400px] aspect-video object-cover transition-opacity duration-700 pointer-events-none scale-150 transform-origin-center ${activeVideo === idx ? 'opacity-100' : 'opacity-0'}`}
           />
         ))}
         {/* Subtle inner shadow overlay */}
