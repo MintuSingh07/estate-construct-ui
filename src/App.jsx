@@ -506,8 +506,9 @@ const App = () => {
       >
         {/* Background Group (Clipped to Hero Height) */}
         <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none">
-          <div className="absolute inset-0 w-full h-full bg-[url('/bg_mountain.png')] bg-cover bg-top scale-[1.15]"></div>
+          <div className="absolute inset-0 w-full h-full bg-[url('/bg_mountain.png')] bg-cover bg-bottom origin-bottom scale-[1.15]"></div>
           <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
+          <div className="absolute -bottom-[1px] left-0 w-full h-[30vh] md:h-[40vh] bg-gradient-to-t from-[#050505] to-transparent z-[10]"></div>
         </div>
         <div className="absolute inset-0 flex flex-col justify-center md:justify-start items-center pt-0 md:pt-32 select-none pointer-events-none z-[5] px-4 -translate-y-28 md:translate-y-0">
           <div className="overflow-hidden w-full">
@@ -545,8 +546,12 @@ const App = () => {
       {/* Second Section (Pinned Vision) */}
       <section 
         id="vision" 
-        className="relative h-screen w-full bg-[#050505] z-20 flex flex-col md:flex-row items-center justify-start md:justify-end pl-8 md:pl-24 pr-8 md:pr-12 pt-24 md:pt-0"
+        className="relative h-screen w-full bg-[#050505] z-20 flex flex-col md:flex-row items-center justify-start md:justify-end pl-8 md:pl-24 pr-8 md:pr-12 pt-24 md:pt-0 overflow-hidden"
       >
+        {/* Ambient Lighting */}
+        <div className="absolute top-[10%] left-[5%] w-[400px] h-[400px] bg-amber-700/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen" />
+        <div className="absolute bottom-[20%] right-[10%] w-[500px] h-[500px] bg-orange-600/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
+
         <div ref={visionContentRef} className="max-w-4xl w-full text-center md:text-right pointer-events-none z-30 px-4 md:px-0">
           <div className="vision-detail-item">
             <h2 className="text-[clamp(1.4rem,3vw,2.6rem)] title-serif tracking-tight leading-relaxed premium-text-gradient italic">
@@ -564,14 +569,18 @@ const App = () => {
         <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#050505] to-transparent z-[15] pointer-events-none" />
         <div className="absolute -bottom-[1px] left-0 w-full h-64 bg-gradient-to-t from-[#050505] to-transparent z-[15] pointer-events-none" />
 
+        {/* Ambient Lighting */}
+        <div className="absolute top-[30%] -left-[10%] w-[600px] h-[600px] bg-amber-600/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen z-[1]" />
+        <div className="absolute bottom-[10%] -right-[5%] w-[700px] h-[700px] bg-amber-800/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen z-[1]" />
+
         {/* Decorative Foundations */}
         <div ref={gridRef} className="principles-line::after absolute inset-0 opacity-10 pointer-events-none" />
         <div ref={spotlightRef} className="spotlight-overlay" />
         
         {/* Hero Heading for Section 3 */}
         <div className="w-full max-w-7xl text-center mb-16 md:mb-20 relative z-10 px-4">
-          <h2 className="text-[clamp(1.5rem,3.2vw,2.8rem)] title-serif tracking-normal md:tracking-tight premium-text-gradient uppercase leading-snug md:leading-none opacity-90 md:whitespace-nowrap">
-            Architecting The Future Through Core Principles
+          <h2 className="text-[clamp(1.5rem,3.2vw,2.8rem)] title-serif tracking-normal md:tracking-tight uppercase leading-snug md:leading-none opacity-90 md:whitespace-nowrap flex justify-center">
+            <span className="premium-text-gradient">Architecting The Future Through Core Principles</span>
           </h2>
         </div>
 
@@ -702,13 +711,18 @@ const App = () => {
         {/* Dark Environment */}
         <div className="absolute inset-0 bg-[#050505] pointer-events-none z-0"></div>
 
+        {/* Ambient Lighting */}
+        <div className="absolute top-0 right-[20%] w-[500px] h-[500px] bg-orange-700/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen z-[1]" />
+        <div className="absolute bottom-[10%] left-[10%] w-[600px] h-[600px] bg-amber-600/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen z-[1]" />
+
         {/* Content Overlay */}
         <div className="relative z-10 w-[95%] max-w-[1800px] flex flex-col items-center">
           
           {/* Section Hero Heading */}
           <div className="w-full flex flex-col md:flex-row justify-between items-end mb-16 md:mb-24">
-            <h2 className="text-[clamp(3rem,6vw,5rem)] title-serif leading-none uppercase text-white tracking-tighter">
-              Featured<br/><span className="text-white/50 italic font-light">Developments</span>
+            <h2 className="text-[clamp(3rem,6vw,5rem)] title-serif leading-none uppercase tracking-tighter flex flex-col">
+              <span className="premium-text-gradient">Featured</span>
+              <span className="premium-text-gradient italic font-light opacity-60">Developments</span>
             </h2>
             <p className="text-white/40 max-w-xs text-xs tracking-widest uppercase mt-6 md:mt-0 technical-monoscope hidden md:block text-right">
                A curated selection of our most distinguished architectural projects.
