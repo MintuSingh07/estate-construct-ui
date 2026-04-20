@@ -9,15 +9,16 @@ const LiquidMaskSection = () => {
   const displacementRef = useRef(null);
 
   const images = {
-    base: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=2000",
-    reveal: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=2000"
+    // Optimized WebP assets for lower RAM footprint
+    base: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=2000&fm=webp",
+    reveal: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=2000&fm=webp"
   };
 
   useGSAP(() => {
     if (!containerRef.current || !maskRef.current) return;
 
     // Use a proxy object for smooth mouse tracking
-    const mouse = { x: -100, y: -100 };
+    const mouse = { x: -300, y: -300 }; // Start off-screen
     const xTo = gsap.quickTo(mouse, "x", { duration: 1, ease: "power4.out" });
     const yTo = gsap.quickTo(mouse, "y", { duration: 1, ease: "power4.out" });
     
@@ -29,7 +30,10 @@ const LiquidMaskSection = () => {
     const sloshTo = gsap.quickTo(physics, "slosh", { duration: 1.5, ease: "elastic.out(1, 0.3)" });
     const freqTo = gsap.quickTo(physics, "freq", { duration: 1, ease: "sine.inOut" });
 
-    // Sync the proxy values to the SVG attributes every frame
+    const cursorTo = gsap.quickTo('.custom-cursor', 'x', { duration: 0.1, ease: 'none' });
+    const cursorYTo = gsap.quickTo('.custom-cursor', 'y', { duration: 0.1, ease: 'none' });
+
+    // Sync the proxy values to the SVG attributes and custom cursor every frame
     const onTick = () => {
       if (maskRef.current) {
         maskRef.current.setAttribute('cx', mouse.x.toString());
@@ -39,57 +43,113 @@ const LiquidMaskSection = () => {
         displacementRef.current.setAttribute('scale', physics.slosh.toString());
       }
       if (turbulenceRef.current) {
-        // Modulating frequency creates "flow" rather than "seed-jumping"
         turbulenceRef.current.setAttribute('baseFrequency', physics.freq.toString());
       }
+      
+      // Update custom cursor position
+      gsap.set('.custom-cursor', { x: mouse.x, y: mouse.y });
     };
-
-    gsap.ticker.add(onTick);
 
     let lastMouseX = 0;
     let lastMouseY = 0;
+    let isVisible = false;
+    let isIdle = false;
+
+    // Smoothly close the circle when idle (User Request)
+    const onIdle = () => {
+      isIdle = true;
+      gsap.to(maskRef.current, { attr: { r: 0 }, duration: 1.5, ease: "power2.inOut" });
+      gsap.to(".custom-cursor", { opacity: 0, scale: 0.8, duration: 0.8 });
+      gsap.to(".liquid-instructions", { opacity: 1, y: 0, duration: 1.2 });
+    };
+
+    const idleTimer = gsap.delayedCall(.3, onIdle).pause();
 
     const handleMouseMove = (e) => {
+      if (!isVisible) return;
       const rect = containerRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      // Update proxy positions
       xTo(x);
       yTo(y);
 
-      // Velocity calculation for dynamic slosh (water weight)
       const dx = x - lastMouseX;
       const dy = y - lastMouseY;
       const speed = Math.sqrt(dx * dx + dy * dy);
       
-      // Dynamic water behavior
       sloshTo(Math.min(130, 60 + speed * 1.5));
       freqTo(0.012 + (speed * 0.0003));
+
+      // Reset idle state on movement
+      if (isIdle) {
+        isIdle = false;
+        gsap.to(maskRef.current, { attr: { r: 350 }, duration: 1, ease: "power4.out" });
+        gsap.to(".custom-cursor", { opacity: 1, scale: 1, duration: 0.4 });
+        gsap.to(".liquid-instructions", { opacity: 0, y: -20, duration: 0.5 });
+      }
+      idleTimer.restart(true);
+
+      // Dynamic cursor stretch based on velocity
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+      const stretch = Math.min(1.4, 1 + speed * 0.005);
+      gsap.to('.cursor-ring', { 
+        scaleX: stretch, 
+        scaleY: 1 / stretch,
+        rotation: angle,
+        duration: 0.2 
+      });
 
       lastMouseX = x;
       lastMouseY = y;
     };
 
-    const container = containerRef.current;
-    container.addEventListener('mousemove', handleMouseMove);
-
     // Interaction feedback for enter/leave
     const onEnter = () => {
-      gsap.to(maskRef.current, { attr: { r: 300 }, duration: 1.2, ease: "power4.out" });
+      isIdle = false;
+      gsap.to(maskRef.current, { attr: { r: 350 }, duration: 1.2, ease: "power4.out" });
       gsap.to(".liquid-instructions", { opacity: 0, y: -20, duration: 0.5 });
+      gsap.to(".custom-cursor", { opacity: 1, scale: 1, duration: 0.4 });
+      idleTimer.restart(true);
     };
 
     const onLeave = () => {
+      idleTimer.pause();
       gsap.to(maskRef.current, { attr: { r: 0 }, duration: 0.8, ease: "power4.in" });
       gsap.to(".liquid-instructions", { opacity: 1, y: 0, duration: 0.8 });
+      gsap.to(".custom-cursor", { opacity: 0, scale: 0.5, duration: 0.4 });
     };
 
-    container.addEventListener('mouseenter', onEnter);
-    container.addEventListener('mouseleave', onLeave);
+    const container = containerRef.current;
 
-    // Subtle idle "breathing" water effect
-    gsap.to(physics, {
+    // PERFORMANCE OPTIMIZATION: Viewport Activation
+    const trigger = gsap.timeline({
+      scrollTrigger: {
+        trigger: container,
+        start: "top bottom+=300", 
+        end: "bottom top-=300",
+        onToggle: (self) => {
+          isVisible = self.isActive;
+          if (isVisible) {
+            gsap.ticker.add(onTick);
+            container.addEventListener('mousemove', handleMouseMove);
+            container.addEventListener('mouseenter', onEnter);
+            container.addEventListener('mouseleave', onLeave);
+          } else {
+            gsap.ticker.remove(onTick);
+            container.removeEventListener('mousemove', handleMouseMove);
+            container.removeEventListener('mouseenter', onEnter);
+            container.removeEventListener('mouseleave', onLeave);
+            // Instant reset for memory relief
+            gsap.set(maskRef.current, { attr: { r: 0 } });
+            gsap.set(".custom-cursor", { opacity: 0 });
+          }
+        }
+      }
+    });
+
+    // Idle "breathing" effect (only when active)
+    const breathingAnim = gsap.to(physics, {
       freq: 0.015,
       duration: 3,
       repeat: -1,
@@ -98,10 +158,11 @@ const LiquidMaskSection = () => {
     });
 
     return () => {
+      gsap.ticker.remove(onTick);
       container.removeEventListener('mousemove', handleMouseMove);
       container.removeEventListener('mouseenter', onEnter);
       container.removeEventListener('mouseleave', onLeave);
-      gsap.ticker.remove(onTick);
+      breathingAnim.kill();
     };
   }, { scope: containerRef });
 
@@ -110,6 +171,15 @@ const LiquidMaskSection = () => {
       ref={containerRef}
       className="relative w-full h-screen overflow-hidden bg-[#050505] cursor-none"
     >
+      {/* Custom Cinematic Cursor */}
+      <div className="custom-cursor fixed top-0 left-0 w-16 h-16 -ml-8 -mt-8 z-[100] pointer-events-none opacity-0 flex items-center justify-center">
+        <div className="cursor-ring absolute inset-0 border-[0.5px] border-white/40 rounded-full bg-white/5 backdrop-blur-[2px]" />
+        <div className="w-1 h-1 bg-amber-500 rounded-full" />
+        <div className="absolute -right-12 top-1/2 -translate-y-1/2 technical-monoscope text-[8px] text-white/50 tracking-widest bg-black/40 px-2 py-1 rounded-sm border border-white/5">
+          DRAG
+        </div>
+      </div>
+
       {/* Base Layer */}
       <div 
         className="absolute inset-0 grayscale opacity-40 scale-105 blur-[2px]"

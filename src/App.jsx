@@ -94,7 +94,7 @@ const App = () => {
       duration: 2.8,
       ease: 'expo.inOut',
       force3D: true
-    }, "-=2.2") // Start immediately with loader
+    }, "-=1.9") // Start immediately with loader
     .from('.hero-text-block', {
       yPercent: 100,
       opacity: 0,
