@@ -7,6 +7,7 @@ import 'lenis/dist/lenis.css';
 import { TbMenu3 } from "react-icons/tb";
 import { AmbientLights } from './components/AmbientLights';
 import { InteractiveShowcase } from './components/InteractiveShowcase';
+import LiquidMaskSection from './components/LiquidMaskSection';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -226,7 +227,19 @@ const App = () => {
         pointerEvents: 'none'
       });
 
-      // 2. Pin Vision: Let Portfolio overlay it after a "hold" duration
+      // 2. Hide Global Building as we enter deeper content
+      gsap.to('.hero-image-container', {
+        scrollTrigger: {
+          trigger: '#portfolio',
+          start: 'top 80%',
+          end: 'top 20%',
+          scrub: true,
+        },
+        opacity: 0,
+        pointerEvents: 'none'
+      });
+
+      // 3. Pin Vision: Let Portfolio overlay it after a "hold" duration
       ScrollTrigger.create({
         trigger: '#vision',
         start: 'top top',
@@ -638,6 +651,7 @@ const App = () => {
       </section>
 
       <InteractiveShowcase />
+      <LiquidMaskSection />
 
       {/* Global Building Layer (Above standard sections, below Portfolio overlay) */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-[150vw] md:w-full flex justify-center items-end px-0 md:px-6 pointer-events-none hero-image-container">
